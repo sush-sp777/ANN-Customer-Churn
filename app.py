@@ -4,23 +4,36 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import StandardScaler,OneHotEncoder,LabelEncoder
 import pickle
-import warnings
+import warnings,os
 
-##Load the trained model
-model=tf.keras.models.load_model('model.keras',safe_mode=False,compile=False)
-
-with open('label_encoder_gender.pkl','rb') as file:
-    label_encoder_gender=pickle.load(file)
-
-with open('one_hot_encoder.pkl','rb') as file:
-    one_hot_encoder=pickle.load(file)
-
-with open('scaler.pkl','rb') as file:
-    scaler=pickle.load(file)
+warnings.filterwarnings("ignore",category=FutureWarning)
+warnings.filterwarnings("ignore",category=UserWarning)
 
 #streamlit app
 st.title('Customer Churn Prediction App')
 st.write("Use this app to predict whether a customer will leave the bank or not.")
+
+@st.cache_resource
+def load_model():
+    if os.path.exists("model.keras"):
+        return tf.keras.models.load_model("model.keras", compile=False, safe_mode=False)
+    elif os.path.exists("model.h5"):
+        return tf.keras.models.load_model("model.h5", compile=False)
+    else:
+        st.error("Model file not found. Please upload model.keras or model.h5")
+        st.stop()
+
+@st.cache_resource
+def load_pickle(filename):
+    with open(filename, "rb") as file:
+        return pickle.load(file)
+
+# Load everything once (cached)
+model = load_model()
+label_encoder_gender = load_pickle("label_encoder_gender.pkl")
+one_hot_encoder = load_pickle("one_hot_encoder.pkl")
+scaler = load_pickle("scaler.pkl")
+
 
 #user input
 geography=st.selectbox('Geography',one_hot_encoder.categories_[0])
@@ -59,17 +72,13 @@ input_data=pd.concat([input.reset_index(drop=True),geo_encoded_df],axis=1)
 input_scaled=scaler.transform(input_data)
 
 #predict churn
-prediction=model.predict(input_scaled)
-prediction_probability=prediction[0][0]
-st.write(f'Churn Probability:{prediction_probability:.2f}')
+if st.button("Predict Churn"):
+    prediction=model.predict(input_scaled)
+    prediction_probability=prediction[0][0]
+    st.write(f'Churn Probability:{prediction_probability:.2f}')
 
-if prediction_probability >0.5:
-    st.write('The customer is likely to churn')
-else:
-    st.write('The customer is not likely to churn')
-
-
-warnings.filterwarnings("ignore",category=FutureWarning)
-warnings.filterwarnings("ignore",category=UserWarning)
-
+    if prediction_probability >0.5:
+        st.write('The customer is likely to churn')
+    else:
+        st.write('The customer is not likely to churn')
 
