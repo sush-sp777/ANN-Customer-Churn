@@ -35,7 +35,7 @@ streamlit run app.py
 2. Enter customer details: Age, Gender, Credit Score, Balance, Tenure, etc.
 3. View the churn probability and result.
 
-🔗 [Open the App](https://ann-customer-churn-qgfsqbztyjwy3ef3g7y6gq.streamlit.app/)
+🔗 [Open the App](https://ann-customer-churn-ggzzogblentyufjentfn2h.streamlit.app/)
 
 ## 📬 Contact
 - GitHub: [sush-sp777](https://github.com/sush-sp777)  
