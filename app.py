@@ -7,7 +7,7 @@ import pickle
 import warnings
 
 ##Load the trained model
-model=tf.keras.models.load_model('model.h5')
+model=tf.keras.models.load_model('model.h5',safe_mode=False,compile=False)
 
 with open('label_encoder_gender.pkl','rb') as file:
     label_encoder_gender=pickle.load(file)
@@ -71,3 +71,4 @@ else:
 
 warnings.filterwarnings("ignore",category=FutureWarning)
 warnings.filterwarnings("ignore",category=UserWarning)
+
